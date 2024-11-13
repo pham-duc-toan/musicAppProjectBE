@@ -65,11 +65,17 @@ export class PlaylistService {
   async addSong(idSongDto: SongToPlayList, playlistId: string, userId) {
     const userInfo: any = await this.userService.findUserId(userId);
     const listPlaylist = userInfo.listPlaylist;
-    if (!listPlaylist.includes(playlistId)) {
+
+    if (
+      !listPlaylist.some(
+        (playlist) => playlist._id.toString() === playlistId.toString(),
+      )
+    ) {
       throw new BadRequestException(
         'Playlist không tồn tại trong danh sách của người dùng.',
       );
     }
+
     const listFavoriteSong = userInfo.listFavoriteSong;
     if (!listFavoriteSong.includes(idSongDto.idSong)) {
       throw new BadRequestException(
@@ -113,11 +119,16 @@ export class PlaylistService {
   async removeSong(idSongDto: SongToPlayList, playlistId: string, userId) {
     const userInfo: any = await this.userService.findUserId(userId);
     const listPlaylist = userInfo.listPlaylist;
-    if (!listPlaylist.includes(playlistId)) {
+    if (
+      !listPlaylist.some(
+        (playlist) => playlist._id.toString() === playlistId.toString(),
+      )
+    ) {
       throw new BadRequestException(
         'Playlist không tồn tại trong danh sách của người dùng.',
       );
     }
+
     const { idSong } = idSongDto;
     if (!isValidObjectId(playlistId)) {
       throw new BadRequestException('Sai định dạng playlistId');
