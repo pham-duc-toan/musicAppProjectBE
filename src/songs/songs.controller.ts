@@ -38,7 +38,6 @@ import {
 } from 'src/interceptors/ValidatorFileExist.interceptor';
 import aqp from 'api-query-params';
 import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
-import { UserService } from 'src/users/users.service';
 
 @Controller('songs')
 export class SongsController {
@@ -62,7 +61,7 @@ export class SongsController {
     return this.songsService.create(createSongDto, req.user?.singerId || '');
   }
 
-  @Patch(':id')
+  @Patch('editSong/:id')
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'avatar', maxCount: 1 },
@@ -126,7 +125,7 @@ export class SongsController {
     return this.songsService.findSongBySinger(req.user.singerId);
   }
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete('deleteSong/:id')
   remove(@Param('id') id: string, @Request() req) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Sai định dạng id');
@@ -153,5 +152,12 @@ export class SongsController {
   @Patch('listen/increase/:id')
   async increaseListen(@Param('id') id: string) {
     return await this.songsService.increaseListen(id);
+  }
+  //------TEST-----------------
+  @Patch('test')
+  async test() {
+    console.log('check');
+
+    return await this.songsService.test();
   }
 }

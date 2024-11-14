@@ -35,10 +35,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       throw err || new UnauthorizedException('token không hợp lệ hoặc hết hạn');
     }
     //các route cần kiểm tra role
-    const privateRouter = [
-      { method: 'PATCH', url: '/api/v1/users/updateSinger' },
-      { method: 'PATCH', url: '/api/v1/users/updateSinger' },
-    ];
+    const privateRouter = [{ method: '', url: '/api/v1/users/' }];
 
     const targetMethod = request.method;
     const targetEndpoint = request.route?.path;

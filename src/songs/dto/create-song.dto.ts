@@ -36,6 +36,10 @@ export class CreateSongDto {
   @IsString()
   lyrics?: string;
 
+  @IsOptional()
+  @IsNumber()
+  position?: number;
+
   @IsNotEmpty({ message: 'Thiếu status' })
   @IsIn(['active', 'inactive'], {
     message: 'Không đúng định dạng status',

@@ -21,6 +21,20 @@ export class SongsService {
     private readonly topicService: TopicsService,
     private readonly usersService: UserService,
   ) {}
+  async test() {
+    // Retrieve all songs sorted by position
+    const songs = await this.songModel.find().sort({ position: 1 }).exec();
+
+    // Update each song's position sequentially from 1 to n
+    await Promise.all(
+      songs.map((song, index) => {
+        song.position = index + 1; // Set position from 1 to n
+        return song.save(); // Save the updated position
+      }),
+    );
+
+    return { message: 'Positions updated successfully' };
+  }
 
   async create(createSongDto: CreateSongDto, singerId: string) {
     if (!singerId) {
@@ -34,6 +48,13 @@ export class SongsService {
     if (!existIdSinger || !existIdTopic) {
       throw new BadRequestException('Sai singerId hoặc topicId!');
     }
+    // Find the maximum position in the existing songs
+    const maxPositionSong = await this.songModel
+      .findOne()
+      .sort({ position: -1 })
+      .exec();
+    const maxPosition = maxPositionSong ? maxPositionSong.position : 0;
+    createSongDto.position = maxPosition + 1;
     const dataNewSong: any = createSongDto;
     dataNewSong.singerId = singerId;
     const newSong = new this.songModel(dataNewSong);
