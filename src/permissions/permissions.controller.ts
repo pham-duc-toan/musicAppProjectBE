@@ -68,4 +68,9 @@ export class PermissionsController {
   async remove(): Promise<void> {
     return this.permissionsService.remove();
   }
+  @ResponeMessage('Xóa tất cả')
+  @Delete(':id')
+  async removeOne(@Param('id') id: string): Promise<void> {
+    return this.permissionsService.removeOne(id);
+  }
 }

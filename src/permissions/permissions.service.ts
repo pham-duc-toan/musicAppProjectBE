@@ -103,4 +103,10 @@ export class PermissionsService {
       throw new NotFoundException(`Chưa xóa được`);
     }
   }
+  async removeOne(id: string): Promise<void> {
+    const result = await this.permissionModel.deleteOne({ _id: id }).exec();
+    if (result.deletedCount === 0) {
+      throw new NotFoundException(`Chưa xóa được`);
+    }
+  }
 }
