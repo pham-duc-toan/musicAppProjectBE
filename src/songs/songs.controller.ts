@@ -153,6 +153,12 @@ export class SongsController {
   async increaseListen(@Param('id') id: string) {
     return await this.songsService.increaseListen(id);
   }
+  //--------ADMIN QUAN LY-----
+  @UseGuards(JwtAuthGuard)
+  @Patch('changeStatus/:id')
+  async changeStatus(@Param('id') id: string) {
+    return await this.songsService.changeStatus(id);
+  }
   //------TEST-----------------
   @Patch('test')
   async test() {

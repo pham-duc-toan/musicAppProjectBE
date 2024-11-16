@@ -206,4 +206,20 @@ export class SongsService {
 
     return song;
   }
+  //-------ADMIN QUAN LY-------
+  async changeStatus(songId: string) {
+    const song = await this.songModel.findById(songId);
+    if (!song) {
+      throw new NotFoundException('Bài hát không tồn tại');
+    }
+    if (song.status == 'active') {
+      song.status = 'inactive';
+    } else {
+      song.status = 'active';
+    }
+
+    await song.save();
+
+    return song;
+  }
 }
