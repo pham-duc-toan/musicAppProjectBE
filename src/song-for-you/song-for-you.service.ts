@@ -12,10 +12,31 @@ export class SongForYouService {
   ) {}
 
   // Lấy danh sách bài hát đề xuất
-  async getRecommendedSongs(): Promise<SongForYou[]> {
-    return this.songForYouModel.find().populate('listSong').exec();
+  async getRecommendedSongs(): Promise<SongForYou> {
+    return this.songForYouModel
+      .findOne({})
+      .populate({
+        path: 'listSong',
+        model: 'Song',
+        populate: [
+          {
+            path: 'singerId',
+            model: 'Singer',
+          },
+          {
+            path: 'topicId',
+            model: 'Topic',
+          },
+        ],
+      })
+      .exec();
   }
+  async getSongs(): Promise<SongForYou> {
+    return this.songForYouModel
+      .findOne({})
 
+      .exec();
+  }
   // Thêm bài hát vào danh sách đề xuất
   async addSongToList(songId: Types.ObjectId): Promise<SongForYou> {
     const songForYou = await this.songForYouModel.findOneAndUpdate(

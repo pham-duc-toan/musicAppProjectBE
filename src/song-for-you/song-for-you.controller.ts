@@ -20,7 +20,10 @@ export class SongForYouController {
   async getRecommendedSongs() {
     return this.songForYouService.getRecommendedSongs();
   }
-
+  @Get('songId')
+  async getSongs() {
+    return this.songForYouService.getSongs();
+  }
   // API để thêm bài hát vào danh sách
   @Post('add/:songId')
   async addSongToList(@Param('songId') songId: string) {
@@ -34,7 +37,7 @@ export class SongForYouController {
       new Types.ObjectId(songId),
     );
   }
-  @Patch('update-list')
+  @Patch('update-order')
   async updateSongList(@Body() body: { listSong: string[] }) {
     const { listSong } = body;
 
