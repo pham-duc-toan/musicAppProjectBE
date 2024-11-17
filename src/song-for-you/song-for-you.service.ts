@@ -56,6 +56,10 @@ export class SongForYouService {
     );
   }
   async updateSongs(listSong: string[]) {
-    return this.songForYouModel.updateOne({}, { listSong: listSong });
+    // Chuyển đổi các chuỗi trong listSong thành Types.ObjectId
+    const objectIdList = listSong.map((songId) => new Types.ObjectId(songId));
+
+    // Thực hiện cập nhật với listSong đã chuyển đổi
+    return this.songForYouModel.updateOne({}, { listSong: objectIdList });
   }
 }
