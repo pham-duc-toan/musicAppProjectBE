@@ -35,14 +35,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       throw err || new UnauthorizedException('token không hợp lệ hoặc hết hạn');
     }
     //các route cần kiểm tra role
-    const privateRouter = [{ method: '', url: '/api/v1/users/' }];
+    const privateRouter = user.listPrivate;
 
     const targetMethod = request.method;
     const targetEndpoint = request.route?.path;
 
     // Kiểm tra xem targetMethod và targetEndpoint có thuộc privateRouter không
     const isPrivateRoute = privateRouter.some(
-      (route) => route.method === targetMethod && route.url === targetEndpoint,
+      (route) =>
+        route.method === targetMethod && route.pathName === targetEndpoint,
     );
 
     // Nếu là private route, kiểm tra quyền truy cập của user
