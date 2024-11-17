@@ -65,12 +65,14 @@ export class SongsService {
   async findAll(options: any): Promise<{ data: Song[]; total: number }> {
     const { filter, sort, skip, limit, projection, population } = options;
     const sortOption = sort || { createdAt: -1 };
+    const populateOption = population || ['singerId', 'topicId'];
     const data = await this.songModel
+      .find({ status: 'active', deleted: 'false' })
       .find(filter)
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
-      .populate(population)
+      .populate(populateOption)
       .exec();
 
     if (!data) {
