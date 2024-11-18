@@ -39,10 +39,24 @@ import {
 import aqp from 'api-query-params';
 import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 
+import { SingersService } from 'src/singers/singers.service';
+
 @Controller('songs')
 export class SongsController {
-  constructor(private readonly songsService: SongsService) {}
-
+  constructor(
+    private readonly songsService: SongsService,
+    private readonly singersService: SingersService,
+  ) {}
+  //CHECK ROLE
+  async checkSinger(req: any) {
+    const singerId = req.user.singerId;
+    const singer = await this.singersService.findOne(singerId);
+    if (singer.status === 'inactive') {
+      throw new UnauthorizedException(
+        'Tài khoản ca sĩ của bạn đang ở trạng thái không hoạt động (inactive).',
+      );
+    }
+  }
   @UseGuards(JwtAuthGuard)
   @Post('create')
   @UseInterceptors(
@@ -54,6 +68,7 @@ export class SongsController {
     CloudinaryMultiFileUploadInterceptor,
   )
   async create(@Body() createSongDto: CreateSongDto, @Request() req) {
+    await this.checkSinger(req);
     //logic
     createSongDto.audio = createSongDto.audio[0];
     createSongDto.avatar = createSongDto.avatar[0];
@@ -71,13 +86,15 @@ export class SongsController {
     CloudinaryMultiFileUploadInterceptor,
   )
   @UseGuards(JwtAuthGuard)
-  update(
+  async update(
     @Param('id') id: string,
     @UploadedFiles()
     @Body()
     updateSongDto: UpdateSongDto,
     @Request() req,
   ) {
+    await this.checkSinger(req);
+
     if (updateSongDto.audio) {
       updateSongDto.audio = updateSongDto.audio[0];
     }
@@ -90,6 +107,7 @@ export class SongsController {
       req.user?.singerId || '',
     );
   }
+  @UseGuards(JwtAuthGuard)
   @Get('full')
   findFull() {
     return this.songsService.findFull();
@@ -164,6 +182,6 @@ export class SongsController {
   async test() {
     console.log('check');
 
-    return await this.songsService.test();
+    // return await this.songsService.test();
   }
 }

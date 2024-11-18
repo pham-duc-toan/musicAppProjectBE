@@ -13,6 +13,7 @@ import {
   ParseFilePipeBuilder,
   Patch,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { SingersService } from './singers.service';
 import { Singer } from './singers.schema';
@@ -27,14 +28,12 @@ import {
 } from 'src/interceptors/ValidatorFileExist.interceptor';
 import { CreateSingerDto } from './dto/create-singer.dto';
 import aqp from 'api-query-params';
-import { UserService } from 'src/users/users.service';
+
+import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 
 @Controller('singers')
 export class SingersController {
-  constructor(
-    private readonly singersService: SingersService,
-    private usersService: UserService,
-  ) {}
+  constructor(private readonly singersService: SingersService) {}
 
   @Post('create')
   @UseInterceptors(
@@ -87,5 +86,11 @@ export class SingersController {
       throw new BadRequestException('Sai định dạng id');
     }
     return this.singersService.deleteSinger(id);
+  }
+  //--------ADMIN QUAN LY-----
+  @UseGuards(JwtAuthGuard)
+  @Patch('changeStatus/:id')
+  async changeStatus(@Param('id') id: string) {
+    return await this.singersService.changeStatus(id);
   }
 }

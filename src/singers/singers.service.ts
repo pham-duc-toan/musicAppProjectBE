@@ -88,4 +88,20 @@ export class SingersService {
 
     return singer;
   }
+  //-------ADMIN QUAN LY-------
+  async changeStatus(singerId: string) {
+    const singer = await this.singerModel.findById(singerId);
+    if (!singer) {
+      throw new NotFoundException('Ca sĩ không tồn tại');
+    }
+    if (singer.status == 'active') {
+      singer.status = 'inactive';
+    } else {
+      singer.status = 'active';
+    }
+
+    await singer.save();
+
+    return singer;
+  }
 }

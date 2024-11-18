@@ -55,7 +55,30 @@ export class TopicsService {
       .populate(population)
       .exec();
   }
+  async findClient(options: any): Promise<Topic[]> {
+    const { filter, sort, skip, limit, projection, population } = options;
+    if (filter.title && typeof filter.title !== 'string') {
+      filter.title = '';
+    }
+    if (filter.slug && typeof filter.slug !== 'string') {
+      filter.slug = '';
+    }
 
+    return this.topicModel
+      .find({ status: 'active', deleted: false })
+      .find({
+        $or: [
+          { title: new RegExp(filter.title, 'i') },
+          { slug: new RegExp(convertToSlug(filter.slug), 'i') },
+          { filter },
+        ],
+      })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate(population)
+      .exec();
+  }
   async findOne(id: string): Promise<Topic> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Sai định dạng id');

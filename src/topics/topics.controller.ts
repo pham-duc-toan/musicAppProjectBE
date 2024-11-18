@@ -54,6 +54,21 @@ export class TopicsController {
     });
   }
 
+  @Get('client')
+  async findClient(@Query() query: any): Promise<Topic[]> {
+    const { sort, skip, limit, projection, population, ...e } = aqp(query);
+
+    const filter = e.filter;
+
+    return this.topicsService.findClient({
+      filter,
+      sort,
+      skip,
+      limit,
+      projection,
+      population,
+    });
+  }
   @Get('detail/:id')
   async findOne(@Param('id') id: string): Promise<Topic> {
     if (!isValidObjectId(id)) {
@@ -62,7 +77,7 @@ export class TopicsController {
     return this.topicsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('editTopic/:id')
   @UseInterceptors(
     FileInterceptor('avatar'),
     ValidatorFileTypeImage,

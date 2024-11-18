@@ -33,9 +33,6 @@ export class Song {
   listen: number;
 
   @Prop()
-  position: number;
-
-  @Prop()
   lyrics: string;
 
   @Prop({ required: true })

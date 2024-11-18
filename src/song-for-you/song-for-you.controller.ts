@@ -6,10 +6,12 @@ import {
   Param,
   Body,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 
 import { Types } from 'mongoose';
 import { SongForYouService } from './song-for-you.service';
+import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 
 @Controller('song-for-you')
 export class SongForYouController {
@@ -24,19 +26,20 @@ export class SongForYouController {
   async getSongs() {
     return this.songForYouService.getSongs();
   }
-  // API để thêm bài hát vào danh sách
+  @UseGuards(JwtAuthGuard)
   @Post('add/:songId')
   async addSongToList(@Param('songId') songId: string) {
     return this.songForYouService.addSongToList(new Types.ObjectId(songId));
   }
 
-  // API để xóa bài hát khỏi danh sách
+  @UseGuards(JwtAuthGuard)
   @Delete('remove/:songId')
   async removeSongFromList(@Param('songId') songId: string) {
     return this.songForYouService.removeSongFromList(
       new Types.ObjectId(songId),
     );
   }
+  @UseGuards(JwtAuthGuard)
   @Patch('update-order')
   async updateSongList(@Body() body: { listSong: string[] }) {
     const { listSong } = body;
