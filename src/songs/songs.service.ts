@@ -12,6 +12,7 @@ import { UpdateSongDto } from './dto/update-song.dto';
 import { SingersService } from 'src/singers/singers.service';
 import { TopicsService } from 'src/topics/topics.service';
 import { UserService } from 'src/users/users.service';
+import { convertToSlug } from 'src/helpers/convertToSlug';
 
 @Injectable()
 export class SongsService {
@@ -48,7 +49,14 @@ export class SongsService {
     const populateOption = population || ['singerId', 'topicId'];
     const data = await this.songModel
       .find({ status: 'active', deleted: 'false' })
-      .find(filter)
+      .find({
+        $or: [
+          { title: new RegExp(filter.query, 'i') },
+          { lyrics: new RegExp(filter.query, 'i') },
+          { slug: new RegExp(convertToSlug(filter.query), 'i') },
+          { filter },
+        ],
+      })
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
@@ -58,6 +66,7 @@ export class SongsService {
     if (!data) {
       throw new BadRequestException('Lỗi tìm kiếm song service');
     }
+
     return { data, total: data.length };
   }
   async findFull(): Promise<Song[]> {

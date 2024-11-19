@@ -63,7 +63,7 @@ export class TopicsService {
     if (filter.slug && typeof filter.slug !== 'string') {
       filter.slug = '';
     }
-
+    console.log(filter);
     return this.topicModel
       .find({ status: 'active', deleted: false })
       .find({

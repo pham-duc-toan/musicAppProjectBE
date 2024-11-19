@@ -51,6 +51,8 @@ export class SingersService {
 
   async findAll(options: any) {
     const { filter, sort, skip, limit, projection, population } = options;
+    console.log(filter);
+
     if (filter.fullName && typeof filter.fullName !== 'string') {
       filter.fullName = '';
     }
@@ -60,8 +62,8 @@ export class SingersService {
     return this.singerModel
       .find({
         $or: [
-          { fullName: new RegExp(filter.fullName, 'i') },
-          { slug: new RegExp(convertToSlug(filter.slug), 'i') },
+          { fullName: new RegExp(filter.query, 'i') },
+          { slug: new RegExp(convertToSlug(filter.query), 'i') },
           { filter },
         ],
       })
