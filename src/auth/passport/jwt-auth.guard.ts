@@ -57,7 +57,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       );
 
       if (!isExist) {
-        throw new ForbiddenException('Không có quyền truy cập!');
+        throw new ForbiddenException('Bạn không có quyền này!');
       }
     }
 

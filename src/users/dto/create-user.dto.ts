@@ -1,4 +1,10 @@
-import { IsEmail, IsIn, IsNotEmpty, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  Matches,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsEmail({}, { message: 'Email khong dung dinh dang' })
@@ -20,4 +26,9 @@ export class CreateUserDto {
     message: 'Không đúng định dạng type',
   })
   type: string;
+  @IsOptional()
+  @IsIn(['active', 'inactive'])
+  status?: string;
+  @IsOptional()
+  avatar?: string; // Trường avatar không bắt buộc
 }

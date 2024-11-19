@@ -9,6 +9,7 @@ import {
   UseGuards,
   Request,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,6 +18,9 @@ import { User } from './user.schema';
 import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 import aqp from 'api-query-params';
 import { UpdateSinger } from './dto/update-singer.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ValidatorFileTypeImage } from 'src/interceptors/ValidatorFileExist.interceptor';
+import { CloudinaryFileUploadInterceptor } from 'src/interceptors/FileToLinkOnlineCloudinary.interceptor';
 
 @Controller('users')
 export class UserController {
@@ -45,18 +49,36 @@ export class UserController {
   async getProfile(@Request() req): Promise<User> {
     return this.userService.profileUser(req.user._id);
   }
-
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('avatar'),
+    ValidatorFileTypeImage,
+    CloudinaryFileUploadInterceptor,
+  )
+  @Patch('detail')
+  async updateProfile(@Request() req, @Body() updateUser: UpdateUserDto) {
+    return this.userService.updateProfile(req.user._id, updateUser);
+  }
   @UseGuards(JwtAuthGuard)
   @Patch('updateSinger')
   async updateSinger(@Request() req, @Body() singerId: UpdateSinger) {
     return this.userService.updateSinger(req.user._id, singerId.id);
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-status/:id')
+  async changeStatus(@Param('id') id: string): Promise<User> {
+    return this.userService.updateStatus(id);
+  }
   @Delete()
   async deleteAll(): Promise<Object> {
     this.userService.deleteAll();
     return {
       message: 'all user is deleted !',
     };
+  }
+  @Get('test')
+  async test() {
+    this.userService.test();
+    return 'ok';
   }
 }

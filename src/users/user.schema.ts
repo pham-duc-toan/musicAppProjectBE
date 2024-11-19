@@ -51,6 +51,13 @@ export class User {
   @Prop({ type: Types.ObjectId, ref: Singer.name, required: false }) // Không bắt buộc
   singerId?: Types.ObjectId;
 
+  @Prop({
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active',
+  })
+  status: 'active' | 'inactive';
+
   @Prop({ default: false })
   deleted: boolean;
 

@@ -228,6 +228,25 @@ export class UserService {
 
     return { message: 'Cập nhật singerId thành công', user };
   }
+  async updateProfile(userId: Types.ObjectId, updateUser: UpdateUserDto) {
+    try {
+      // Kiểm tra và cập nhật người dùng
+      const user = await this.userModel.findOneAndUpdate(
+        { _id: userId }, // Điều kiện tìm kiếm
+        updateUser, // Dữ liệu cần cập nhật
+        { new: true }, // Trả về bản ghi sau khi cập nhật
+      );
+
+      if (!user) {
+        throw new Error('Người dùng không tồn tại.');
+      }
+
+      return user;
+    } catch (error) {
+      throw new Error(`Cập nhật thất bại: ${error.message}`);
+    }
+  }
+
   //----FAVORITE SONGS--------
   async getFavoriteSongs(userId: Types.ObjectId) {
     // Tìm user theo userId và populate listFavoriteSong để lấy chi tiết các bài hát
@@ -293,5 +312,31 @@ export class UserService {
     await user.save(); // Lưu user với listFavoriteSong đã được cập nhật
 
     return user;
+  }
+  async updateStatus(userId: string): Promise<User> {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    let newStatus = 'active';
+    if (user.status == 'active') {
+      newStatus = 'inactive';
+    }
+    //@ts-ignore
+    user.status = newStatus;
+    await user.save();
+    return user;
+  }
+  async test(): Promise<void> {
+    try {
+      // Update all users' status to 'active'
+      const result = await this.userModel.updateMany(
+        {}, // This is the filter, empty means all users
+        { $set: { status: 'active' } }, // The update operation to set status to 'active'
+      );
+    } catch (error) {
+      console.error('Error updating users:', error);
+    }
   }
 }

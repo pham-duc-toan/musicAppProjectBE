@@ -14,6 +14,8 @@ import {
   Patch,
   Query,
   UseGuards,
+  Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SingersService } from './singers.service';
 import { Singer } from './singers.schema';
@@ -34,7 +36,7 @@ import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 @Controller('singers')
 export class SingersController {
   constructor(private readonly singersService: SingersService) {}
-
+  @UseGuards(JwtAuthGuard)
   @Post('create')
   @UseInterceptors(
     FileInterceptor('avatar'),
@@ -59,6 +61,7 @@ export class SingersController {
       population,
     });
   }
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseInterceptors(
     FileInterceptor('avatar'),
@@ -67,9 +70,12 @@ export class SingersController {
   )
   async patchSinger(
     @Param('id') id: string,
-
+    @Request() req,
     @Body() updateSingerDto: UpdateSingerDto,
   ) {
+    if (req.user.singerId != id) {
+      throw new UnauthorizedException('Bạn không phải quản lý ca sĩ này!');
+    }
     return this.singersService.patchSinger(id, updateSingerDto);
   }
   @Get('detail/:id')

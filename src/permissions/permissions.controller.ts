@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   BadRequestException,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 
 import { PermissionsService } from './permissions.service';
@@ -18,8 +19,9 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { ResponeMessage } from 'src/decorator/customize';
 import { isValidObjectId } from 'mongoose';
 import aqp from 'api-query-params';
+import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 const API = '/api/v1/';
-
+@UseGuards(JwtAuthGuard)
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
