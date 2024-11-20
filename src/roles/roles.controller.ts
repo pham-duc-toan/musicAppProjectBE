@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   BadRequestException,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 
 import { RolesService } from './roles.service';
@@ -18,16 +19,17 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { ResponeMessage } from 'src/decorator/customize';
 import { isValidObjectId } from 'mongoose';
 import aqp from 'api-query-params';
+import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
-
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
     return this.rolesService.create(createRoleDto);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(@Query() query: any): Promise<Role[]> {
     const { sort, skip, limit, projection, population, ...e } = aqp(query);
@@ -53,7 +55,7 @@ export class RolesController {
     }
     return this.rolesService.findOne(id);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -61,17 +63,12 @@ export class RolesController {
   ): Promise<Role> {
     return this.rolesService.update(id, updateRoleDto);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Sai định dạng id');
     }
     return this.rolesService.remove(id);
-  }
-  @ResponeMessage('Xóa tất cả thành công')
-  @Delete()
-  async removeAll(): Promise<void> {
-    return this.rolesService.removeAll();
   }
 }

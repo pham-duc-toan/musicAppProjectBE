@@ -69,12 +69,9 @@ export class UserController {
   async changeStatus(@Param('id') id: string): Promise<User> {
     return this.userService.updateStatus(id);
   }
-  @Delete()
-  async deleteAll(): Promise<Object> {
-    this.userService.deleteAll();
-    return {
-      message: 'all user is deleted !',
-    };
+  @Delete(':id')
+  async deleteOne(@Param('id') id: string) {
+    return this.userService.deleteOne(id);
   }
   @Get('test')
   async test() {

@@ -10,6 +10,7 @@ import {
   Patch,
   UseInterceptors,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { TopicsService } from './topics.service';
 import { UpdateTopicDto } from './dto/update-topic.dto';
@@ -23,11 +24,12 @@ import {
 } from 'src/interceptors/ValidatorFileExist.interceptor';
 import { CloudinaryFileUploadInterceptor } from 'src/interceptors/FileToLinkOnlineCloudinary.interceptor';
 import aqp from 'api-query-params';
+import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 
 @Controller('topics')
 export class TopicsController {
   constructor(private readonly topicsService: TopicsService) {}
-
+  @UseGuards(JwtAuthGuard)
   @Post('create')
   @UseInterceptors(
     FileInterceptor('avatar'),
@@ -76,7 +78,7 @@ export class TopicsController {
     }
     return this.topicsService.findOne(id);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch('editTopic/:id')
   @UseInterceptors(
     FileInterceptor('avatar'),
@@ -92,7 +94,7 @@ export class TopicsController {
     }
     return this.topicsService.update(id, updateTopicDto);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     if (!isValidObjectId(id)) {

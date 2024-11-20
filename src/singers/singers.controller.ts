@@ -85,7 +85,8 @@ export class SingersController {
     }
     return this.singersService.findOne(id);
   }
-
+  //--------ADMIN QUAN LY-----
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteSinger(@Param('id') id: string) {
     if (!isValidObjectId(id)) {
@@ -93,7 +94,7 @@ export class SingersController {
     }
     return this.singersService.deleteSinger(id);
   }
-  //--------ADMIN QUAN LY-----
+
   @UseGuards(JwtAuthGuard)
   @Patch('changeStatus/:id')
   async changeStatus(@Param('id') id: string) {

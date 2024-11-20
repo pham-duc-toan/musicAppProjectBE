@@ -137,10 +137,4 @@ export class RolesService {
       throw new NotFoundException(`Role with ID ${id} not found`);
     }
   }
-  async removeAll(): Promise<void> {
-    const result = await this.roleModel.deleteMany().exec();
-    if (result.deletedCount === 0) {
-      throw new NotFoundException(`Chưa xóa được`);
-    }
-  }
 }

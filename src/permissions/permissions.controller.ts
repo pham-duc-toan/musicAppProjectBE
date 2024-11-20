@@ -21,11 +21,11 @@ import { isValidObjectId } from 'mongoose';
 import aqp from 'api-query-params';
 import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 const API = '/api/v1/';
-@UseGuards(JwtAuthGuard)
+
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
-
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @Body() createPermissionDto: CreatePermissionDto,
@@ -33,7 +33,7 @@ export class PermissionsController {
     createPermissionDto.pathName = API + createPermissionDto.pathName;
     return this.permissionsService.create(createPermissionDto);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(@Query() query: any): Promise<Permission[]> {
     const { sort, skip, limit, projection, population, ...e } = aqp(query);
@@ -48,7 +48,7 @@ export class PermissionsController {
       population,
     });
   }
-
+  @UseGuards(JwtAuthGuard)
   @Get('detail/:id')
   async findOne(@Param('id') id: string): Promise<Permission> {
     if (!isValidObjectId(id)) {
@@ -56,7 +56,7 @@ export class PermissionsController {
     }
     return this.permissionsService.findOne(id);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -65,6 +65,7 @@ export class PermissionsController {
     updatePermissionDto.pathName = API + updatePermissionDto.pathName;
     return this.permissionsService.update(id, updatePermissionDto);
   }
+  @UseGuards(JwtAuthGuard)
   @ResponeMessage('Xóa tất cả')
   @Delete('')
   async remove(): Promise<void> {

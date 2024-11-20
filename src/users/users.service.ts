@@ -159,8 +159,8 @@ export class UserService {
     }
     throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
   }
-  async deleteAll(): Promise<void> {
-    await this.userModel.deleteMany({}).exec();
+  async deleteOne(id: string) {
+    return await this.userModel.findByIdAndDelete(id).exec();
   }
   updateTokenRefresh = async (refresh_token: string, id: string) => {
     if (!isValidObjectId(id)) {
