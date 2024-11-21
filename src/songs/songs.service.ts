@@ -79,6 +79,15 @@ export class SongsService {
       .sort({ createdAt: -1 })
       .exec();
   }
+  async findOfTopic(topicId: string) {
+    return this.songModel
+      .find({ deleted: false, status: 'active' })
+      .find({ topicId: topicId })
+      .populate('singerId')
+      .populate('topicId')
+      .sort({ createdAt: -1 })
+      .exec();
+  }
   async findFull(): Promise<Song[]> {
     return this.songModel
       .find({ deleted: false })

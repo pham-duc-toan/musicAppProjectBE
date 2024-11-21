@@ -130,6 +130,10 @@ export class SongsController {
   findSongOfSinger(@Param('singerId') singerId: string) {
     return this.songsService.findOfSinger(singerId);
   }
+  @Get('song-of-topic/:topicId')
+  findSongOfTopic(@Param('topicId') topicId: string) {
+    return this.songsService.findOfTopic(topicId);
+  }
   @Get('detail/:id')
   findOne(@Param('id') id: string) {
     if (!isValidObjectId(id)) {
