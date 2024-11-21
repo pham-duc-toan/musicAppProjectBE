@@ -19,6 +19,7 @@ import { PlaylistService } from 'src/playlist/playlist.service';
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @Inject(forwardRef(() => RolesService))
     private readonly roleService: RolesService,
     @Inject(forwardRef(() => SingersService))
     private readonly singerService: SingersService,
@@ -353,6 +354,10 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     return await this.userModel.findByIdAndUpdate(userId, { role: roleId });
+  }
+  //user thay doi khi xoa role
+  async removeRole(roleId: string, roleNew: string) {
+    return await this.userModel.updateMany({ role: roleId }, { role: roleNew });
   }
   async test(): Promise<void> {
     try {

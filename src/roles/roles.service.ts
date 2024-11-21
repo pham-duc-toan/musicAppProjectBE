@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,12 +12,15 @@ import { Role, RoleDocument } from './roles.schema';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { PermissionsService } from 'src/permissions/permissions.service';
+import { UserService } from 'src/users/users.service';
 
 @Injectable()
 export class RolesService {
   constructor(
     @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>,
     private readonly permissionService: PermissionsService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
   existPermission = async (id: string) => {
     if (!isValidObjectId(id)) {
@@ -132,6 +137,12 @@ export class RolesService {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Sai định dạng id role');
     }
+    const roleCurrent = await this.roleModel.findById(id);
+    if (roleCurrent.roleName == 'User' || roleCurrent.roleName == 'Admin') {
+      throw new BadRequestException('Không thể xóa role Admin hoặc User!');
+    }
+    const roleClient = await this.roleModel.findOne({ roleName: 'User' });
+    await this.userService.removeRole(id, roleClient.id);
     const result = await this.roleModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0) {
       throw new NotFoundException(`Role with ID ${id} not found`);

@@ -11,7 +11,7 @@ import { PlaylistModule } from 'src/playlist/playlist.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    RolesModule,
+    forwardRef(() => RolesModule),
     CloudinaryModule,
     forwardRef(() => SingersModule),
     forwardRef(() => PlaylistModule),
