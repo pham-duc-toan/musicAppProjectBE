@@ -231,4 +231,8 @@ export class PlaylistService {
       .populate('listSong');
     return updatedPlaylist;
   }
+  //xoa tat ca playlist cua user khi user bi xoa
+  async removeByDeleteUser(userId: string) {
+    return await this.playlistModel.deleteMany({ userId: userId });
+  }
 }
