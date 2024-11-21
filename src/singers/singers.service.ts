@@ -3,8 +3,10 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,11 +15,14 @@ import { isValidObjectId, Model } from 'mongoose';
 import { Singer, SingerDocument } from './singers.schema';
 import { UpdateSingerDto } from './dto/update-singer.dto';
 import { convertToSlug } from 'src/helpers/convertToSlug';
+import { UserService } from 'src/users/users.service';
 
 @Injectable()
 export class SingersService {
   constructor(
     @InjectModel(Singer.name) private singerModel: Model<SingerDocument>,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
   async existId(id: string) {
     if (!isValidObjectId(id)) {
@@ -81,16 +86,17 @@ export class SingersService {
     const singer = await this.singerModel.findById(id).exec();
     return singer;
   }
-
+  //-------ADMIN QUAN LY-------
   async deleteSinger(id: string) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Sai định dạng id');
     }
-    const singer = await this.singerModel.deleteOne({ _id: id });
 
+    const singer = await this.singerModel.deleteOne({ _id: id });
+    await this.userService.deleteSinger(id);
     return singer;
   }
-  //-------ADMIN QUAN LY-------
+
   async changeStatus(singerId: string) {
     const singer = await this.singerModel.findById(singerId);
     if (!singer) {

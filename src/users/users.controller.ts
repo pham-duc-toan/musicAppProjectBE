@@ -73,6 +73,15 @@ export class UserController {
   async deleteOne(@Param('id') id: string) {
     return this.userService.deleteOne(id);
   }
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-role/:idUser/:idRole')
+  async updateRole(
+    @Param('idUser') idUser: string, // Lấy tham số idUser từ route
+    @Param('idRole') idRole: string, // Lấy tham số idRole từ route
+  ): Promise<User> {
+    return this.userService.updateRole(idUser, idRole);
+  }
+
   @Get('test')
   async test() {
     this.userService.test();

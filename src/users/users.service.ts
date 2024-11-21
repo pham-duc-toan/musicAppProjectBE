@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,12 +12,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { RolesService } from 'src/roles/roles.service';
+import { SingersService } from 'src/singers/singers.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private readonly roleService: RolesService,
+    @Inject(forwardRef(() => SingersService))
+    private readonly singerService: SingersService,
   ) {}
   checkRoleExist = async (id: string) => {
     if (!isValidObjectId(id)) {
@@ -160,6 +165,9 @@ export class UserService {
     throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
   }
   async deleteOne(id: string) {
+    const user = await this.userModel.findById(id);
+    const singerId = user.singerId.toString();
+    await this.singerService.deleteSinger(singerId);
     return await this.userModel.findByIdAndDelete(id).exec();
   }
   updateTokenRefresh = async (refresh_token: string, id: string) => {
@@ -246,7 +254,13 @@ export class UserService {
       throw new Error(`Cập nhật thất bại: ${error.message}`);
     }
   }
-
+  // xoa singerId khi singerId xoa
+  async deleteSinger(singerId: string) {
+    return await this.userModel.updateOne(
+      { singerId: singerId },
+      { singerId: undefined },
+    );
+  }
   //----FAVORITE SONGS--------
   async getFavoriteSongs(userId: Types.ObjectId) {
     // Tìm user theo userId và populate listFavoriteSong để lấy chi tiết các bài hát
@@ -327,6 +341,14 @@ export class UserService {
     user.status = newStatus;
     await user.save();
     return user;
+  }
+  async updateRole(userId: string, roleId: string): Promise<User> {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return await this.userModel.findByIdAndUpdate(userId, { role: roleId });
   }
   async test(): Promise<void> {
     try {

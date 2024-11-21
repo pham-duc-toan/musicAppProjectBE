@@ -4,4 +4,6 @@ import { CreateUserDto } from './create-user.dto';
 export class UpdateUserDto extends OmitType(PartialType(CreateUserDto), [
   'username',
   'password',
+  'role',
+  'status',
 ] as const) {}
