@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -18,8 +20,10 @@ import { convertToSlug } from 'src/helpers/convertToSlug';
 export class SongsService {
   constructor(
     @InjectModel(Song.name) private songModel: Model<SongDocument>,
+    @Inject(forwardRef(() => SingersService))
     private readonly singerService: SingersService,
     private readonly topicService: TopicsService,
+    @Inject(forwardRef(() => UserService))
     private readonly usersService: UserService,
   ) {}
 

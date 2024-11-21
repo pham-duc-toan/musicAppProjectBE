@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
 import { PlaylistController } from './playlist.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,10 +11,11 @@ import { UserModule } from 'src/users/users.module';
     MongooseModule.forFeature([
       { name: PlayList.name, schema: PlayListSchema },
     ]),
-    SongsModule,
-    UserModule,
+    forwardRef(() => SongsModule),
+    forwardRef(() => UserModule),
   ],
   controllers: [PlaylistController],
   providers: [PlaylistService],
+  exports: [PlaylistService],
 })
 export class PlaylistModule {}

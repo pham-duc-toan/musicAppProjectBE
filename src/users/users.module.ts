@@ -6,6 +6,7 @@ import { UserController } from './users.controller';
 import { RolesModule } from 'src/roles/roles.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { SingersModule } from 'src/singers/singers.module';
+import { PlaylistModule } from 'src/playlist/playlist.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SingersModule } from 'src/singers/singers.module';
     RolesModule,
     CloudinaryModule,
     forwardRef(() => SingersModule),
+    forwardRef(() => PlaylistModule),
   ],
   providers: [UserService],
   controllers: [UserController],

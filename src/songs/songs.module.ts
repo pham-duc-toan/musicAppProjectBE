@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { SongsController } from './songs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -12,9 +12,9 @@ import { UserModule } from 'src/users/users.module';
   imports: [
     MongooseModule.forFeature([{ name: Song.name, schema: SongSchema }]),
     CloudinaryModule,
-    SingersModule,
+    forwardRef(() => SingersModule),
     TopicsModule,
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   controllers: [SongsController],
   providers: [SongsService],

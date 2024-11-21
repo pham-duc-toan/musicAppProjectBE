@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { RolesService } from 'src/roles/roles.service';
 import { SingersService } from 'src/singers/singers.service';
+import { PlaylistService } from 'src/playlist/playlist.service';
 
 @Injectable()
 export class UserService {
@@ -21,6 +22,8 @@ export class UserService {
     private readonly roleService: RolesService,
     @Inject(forwardRef(() => SingersService))
     private readonly singerService: SingersService,
+    @Inject(forwardRef(() => PlaylistService))
+    private readonly playlistService: PlaylistService,
   ) {}
   checkRoleExist = async (id: string) => {
     if (!isValidObjectId(id)) {
@@ -168,6 +171,7 @@ export class UserService {
     const user = await this.userModel.findById(id);
     const singerId = user.singerId.toString();
     await this.singerService.deleteSinger(singerId);
+    await this.playlistService.removeByDeleteUser(id);
     return await this.userModel.findByIdAndDelete(id).exec();
   }
   updateTokenRefresh = async (refresh_token: string, id: string) => {

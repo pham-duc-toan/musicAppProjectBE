@@ -1,6 +1,8 @@
 // src/playlist/playlist.service.ts
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,12 +15,13 @@ import { UserService } from 'src/users/users.service';
 import { SongToPlayList } from './dto/add-song-to-playlist.dto';
 import { SongsService } from 'src/songs/songs.service';
 import { Song } from 'src/songs/songs.shema';
-import { populate } from 'dotenv';
 @Injectable()
 export class PlaylistService {
   constructor(
     @InjectModel(PlayList.name) private playlistModel: Model<PlayList>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    @Inject(forwardRef(() => SongsService))
     private readonly songService: SongsService,
   ) {}
   async findAll(): Promise<PlayList[]> {
