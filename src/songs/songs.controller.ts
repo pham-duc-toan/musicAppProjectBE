@@ -126,7 +126,10 @@ export class SongsController {
       population,
     });
   }
-
+  @Get('song-of-singer/:singerId')
+  findSongOfSinger(@Param('singerId') singerId: string) {
+    return this.songsService.findOfSinger(singerId);
+  }
   @Get('detail/:id')
   findOne(@Param('id') id: string) {
     if (!isValidObjectId(id)) {

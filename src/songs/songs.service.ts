@@ -69,6 +69,16 @@ export class SongsService {
 
     return { data, total: data.length };
   }
+
+  async findOfSinger(singerId: string) {
+    return this.songModel
+      .find({ deleted: false, status: 'active' })
+      .find({ singerId: singerId })
+      .populate('singerId')
+      .populate('topicId')
+      .sort({ createdAt: -1 })
+      .exec();
+  }
   async findFull(): Promise<Song[]> {
     return this.songModel
       .find({ deleted: false })
