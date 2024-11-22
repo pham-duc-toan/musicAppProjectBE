@@ -16,6 +16,7 @@ import { Singer, SingerDocument } from './singers.schema';
 import { UpdateSingerDto } from './dto/update-singer.dto';
 import { convertToSlug } from 'src/helpers/convertToSlug';
 import { UserService } from 'src/users/users.service';
+import { SongsService } from 'src/songs/songs.service';
 
 @Injectable()
 export class SingersService {
@@ -23,6 +24,8 @@ export class SingersService {
     @InjectModel(Singer.name) private singerModel: Model<SingerDocument>,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    @Inject(forwardRef(() => SongsService))
+    private readonly songService: SongsService,
   ) {}
   async existId(id: string) {
     if (!isValidObjectId(id)) {
@@ -78,12 +81,48 @@ export class SingersService {
       .populate(population)
       .exec();
   }
+  async findClient(options: any) {
+    const { filter, sort, skip, limit, projection, population } = options;
+    console.log(filter);
 
+    if (filter.fullName && typeof filter.fullName !== 'string') {
+      filter.fullName = '';
+    }
+    if (filter.slug && typeof filter.slug !== 'string') {
+      filter.slug = '';
+    }
+    return this.singerModel
+      .find({ status: 'active', deleted: false })
+      .find({
+        $or: [
+          { fullName: new RegExp(filter.query, 'i') },
+          { slug: new RegExp(convertToSlug(filter.query), 'i') },
+          { filter },
+        ],
+      })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate(population)
+      .exec();
+  }
   async findOne(id: string) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Sai định dạng id');
     }
     const singer = await this.singerModel.findById(id).exec();
+    return singer;
+  }
+  async findOneClient(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Sai định dạng id');
+    }
+    const singer = await this.singerModel
+      .findOne({ _id: id, status: 'active', deleted: false })
+      .exec();
+    if (!singer) {
+      throw new BadRequestException('Không tồn tại singer này!');
+    }
     return singer;
   }
   //-------ADMIN QUAN LY-------
@@ -104,6 +143,7 @@ export class SingersService {
     }
     if (singer.status == 'active') {
       singer.status = 'inactive';
+      await this.songService.banSongByBanSinger(singerId);
     } else {
       singer.status = 'active';
     }

@@ -31,6 +31,35 @@ export class SongForYouService {
       })
       .exec();
   }
+  async getClientRecommendSong(): Promise<SongForYou> {
+    const songForYou = await this.songForYouModel
+      .findOne({})
+      .populate({
+        path: 'listSong',
+        model: 'Song',
+        populate: [
+          {
+            path: 'singerId',
+            model: 'Singer',
+          },
+          {
+            path: 'topicId',
+            model: 'Topic',
+          },
+        ],
+      })
+      .exec();
+
+    if (songForYou?.listSong) {
+      // Lọc các bài hát có status là 'active'
+      songForYou.listSong = songForYou.listSong.filter(
+        (song: any) => song.status === 'active' && song.deleted === false,
+      );
+    }
+
+    return songForYou;
+  }
+
   async getSongs(): Promise<SongForYou> {
     return this.songForYouModel
       .findOne({})

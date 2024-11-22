@@ -13,7 +13,7 @@ import { UserModule } from 'src/users/users.module';
     MongooseModule.forFeature([{ name: Song.name, schema: SongSchema }]),
     CloudinaryModule,
     forwardRef(() => SingersModule),
-    TopicsModule,
+    forwardRef(() => TopicsModule),
     forwardRef(() => UserModule),
   ],
   controllers: [SongsController],

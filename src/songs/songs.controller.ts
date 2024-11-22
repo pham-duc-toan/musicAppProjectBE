@@ -19,16 +19,11 @@ import {
   Request,
   UnauthorizedException,
 } from '@nestjs/common';
-import parse from 'api-query-params';
+
 import { SongsService } from './songs.service';
 import { CreateSongDto } from './dto/create-song.dto';
 import { UpdateSongDto } from './dto/update-song.dto';
-import {
-  FileFieldsInterceptor,
-  FilesInterceptor,
-} from '@nestjs/platform-express';
-
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 import { isValidObjectId } from 'mongoose';
 import { CloudinaryMultiFileUploadInterceptor } from 'src/interceptors/FileToLinkOnlineCloudinary.interceptor';

@@ -22,6 +22,11 @@ export class SongForYouController {
   async getRecommendedSongs() {
     return this.songForYouService.getRecommendedSongs();
   }
+  @Get('client')
+  async getClientRecommendedSongs() {
+    return this.songForYouService.getClientRecommendSong();
+  }
+  // lay ra danh sach bai hat de xuat nhung o dang id
   @Get('songId')
   async getSongs() {
     return this.songForYouService.getSongs();

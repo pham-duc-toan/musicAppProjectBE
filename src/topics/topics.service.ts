@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,11 +11,14 @@ import { Topic, TopicDocument } from './topics.schema';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
 import { convertToSlug } from 'src/helpers/convertToSlug';
+import { SongsService } from 'src/songs/songs.service';
 
 @Injectable()
 export class TopicsService {
   constructor(
     @InjectModel(Topic.name) private topicModel: Model<TopicDocument>,
+    @Inject(forwardRef(() => SongsService))
+    private readonly songService: SongsService,
   ) {}
   async existId(id: string) {
     if (!isValidObjectId(id)) {
@@ -63,7 +68,7 @@ export class TopicsService {
     if (filter.slug && typeof filter.slug !== 'string') {
       filter.slug = '';
     }
-    console.log(filter);
+
     return this.topicModel
       .find({ status: 'active', deleted: false })
       .find({
@@ -99,6 +104,9 @@ export class TopicsService {
       .exec();
     if (!updatedTopic) {
       throw new NotFoundException(`Topic with ID ${id} not found`);
+    }
+    if (updateTopicDto.status == 'inactive') {
+      await this.songService.banSongByBanTopic(id);
     }
     return updatedTopic;
   }

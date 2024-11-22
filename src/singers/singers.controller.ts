@@ -61,6 +61,21 @@ export class SingersController {
       population,
     });
   }
+  @Get('client')
+  @ResponeMessage('Find all client')
+  async findClient(@Query() query: any): Promise<Singer[]> {
+    const { sort, skip, limit, projection, population, ...e } = aqp(query);
+
+    const filter = e.filter;
+    return this.singersService.findClient({
+      filter,
+      sort,
+      skip,
+      limit,
+      projection,
+      population,
+    });
+  }
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseInterceptors(
@@ -84,6 +99,13 @@ export class SingersController {
       throw new BadRequestException('Sai định dạng id');
     }
     return this.singersService.findOne(id);
+  }
+  @Get('detailClient/:id')
+  async findOneClient(@Param('id') id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Sai định dạng id');
+    }
+    return this.singersService.findOneClient(id);
   }
   //--------ADMIN QUAN LY-----
   @UseGuards(JwtAuthGuard)

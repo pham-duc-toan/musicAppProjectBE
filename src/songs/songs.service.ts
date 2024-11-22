@@ -22,6 +22,7 @@ export class SongsService {
     @InjectModel(Song.name) private songModel: Model<SongDocument>,
     @Inject(forwardRef(() => SingersService))
     private readonly singerService: SingersService,
+    @Inject(forwardRef(() => TopicsService))
     private readonly topicService: TopicsService,
     @Inject(forwardRef(() => UserService))
     private readonly usersService: UserService,
@@ -220,11 +221,39 @@ export class SongsService {
 
     return song;
   }
+  //-------ban bai hat khi bi ban singer----
+  async banSongByBanSinger(singerId: string) {
+    return await this.songModel.updateMany(
+      { singerId: singerId },
+      { status: 'inactive' },
+    );
+  }
+  //-------ban bai hat khi bi ban singer----
+  async banSongByBanTopic(topicId: string) {
+    return await this.songModel.updateMany(
+      { topicId: topicId },
+      { status: 'inactive' },
+    );
+  }
   //-------ADMIN QUAN LY-------
   async changeStatus(songId: string) {
-    const song = await this.songModel.findById(songId);
+    const song = await this.songModel
+      .findById(songId)
+      .populate('singerId')
+      .populate('topicId');
     if (!song) {
       throw new NotFoundException('Bài hát không tồn tại');
+    }
+
+    if (
+      //@ts-ignore
+      song.topicId?.status == 'inactive' ||
+      //@ts-ignore
+      song.singerId?.status == 'inactive'
+    ) {
+      throw new UnauthorizedException(
+        'Ca sĩ của bài hát hoặc chủ đề của bài hát hiện không hoạt động',
+      );
     }
     if (song.status == 'active') {
       song.status = 'inactive';

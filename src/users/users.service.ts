@@ -161,7 +161,12 @@ export class UserService {
       .populate('role')
       .lean()
       .exec();
-
+    if (user.status == 'inactive') {
+      throw new BadRequestException('Tài khoản của bạn đã bị khóa');
+    }
+    if (user.deleted == true) {
+      throw new BadRequestException('Tài khoản của bạn đã bị xóa');
+    }
     if (user && compareSync(pass, user.password)) {
       const { password, ...result } = user;
       return result;
