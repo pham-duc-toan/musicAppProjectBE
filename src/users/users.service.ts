@@ -61,9 +61,11 @@ export class UserService {
 
   async findAll(options: any): Promise<User[]> {
     const { filter, sort, skip, limit, projection, population } = options;
+
     return this.userModel
       .find(filter)
       .sort(sort)
+      .select('-password')
       .skip(skip)
       .limit(limit)
       .populate(population)
@@ -133,20 +135,20 @@ export class UserService {
           ],
         },
       })
-      // .populate({
-      //   path: 'listFavoriteSong',
-      //   model: 'Song',
-      //   populate: [
-      //     {
-      //       path: 'singerId',
-      //       model: 'Singer',
-      //     },
-      //     {
-      //       path: 'topicId',
-      //       model: 'Topic',
-      //     },
-      //   ],
-      // })
+      .populate({
+        path: 'listFavoriteSong',
+        model: 'Song',
+        populate: [
+          {
+            path: 'singerId',
+            model: 'Singer',
+          },
+          {
+            path: 'topicId',
+            model: 'Topic',
+          },
+        ],
+      })
       .populate({
         path: 'singerId',
         model: 'Singer',
