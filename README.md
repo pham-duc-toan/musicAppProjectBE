@@ -7,15 +7,3 @@
 =================
 
 Tác giả: Toàn Đẹp Trai
-
-Mọi thông tin về Tác giả Toàn Đẹp Trai, các bạn có thể tìm kiếm tại đây:
-
-Website chính thức: https://toandeptrai.com.vn/
-
-Youtube “Toàn Đẹp Trai” : https://www.youtube.com/@toandeptrai
-
-Tiktok “Toàn Đẹp Trai” : https://www.tiktok.com/@toandeptrai
-
-Fanpage “Toàn Đẹp Trai” : https://www.facebook.com/askITwithERIC/
-
-Udemy Toàn Đẹp Trai: https://www.udemy.com/user/eric-7039/
