@@ -91,7 +91,7 @@ export class SingersService {
     if (filter.slug && typeof filter.slug !== 'string') {
       filter.slug = '';
     }
-    return this.singerModel
+    const singers = await this.singerModel
       .find({ status: 'active', deleted: false })
       .find({
         $or: [
@@ -105,6 +105,19 @@ export class SingersService {
       .limit(limit)
       .populate(population)
       .exec();
+    // Thêm trường số lượng bài hát (songs) cho mỗi singer
+    const enrichedSingers = await Promise.all(
+      singers.map(async (singer: any) => {
+        const songsCount = await this.songService.findOfSinger(singer._id);
+        const count = songsCount.length || 0;
+        return {
+          ...singer.toObject(), // Chuyển từ mongoose object sang plain object
+          songsCount: count, // Thêm trường số lượng bài hát
+        };
+      }),
+    );
+
+    return enrichedSingers;
   }
   async findOne(id: string) {
     if (!isValidObjectId(id)) {

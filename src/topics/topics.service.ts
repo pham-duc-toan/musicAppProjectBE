@@ -69,7 +69,7 @@ export class TopicsService {
       filter.slug = '';
     }
 
-    return this.topicModel
+    const topics = await this.topicModel
       .find({ status: 'active', deleted: false })
       .find({
         $or: [
@@ -83,6 +83,20 @@ export class TopicsService {
       .limit(limit)
       .populate(population)
       .exec();
+
+    // Thêm trường số lượng bài hát (songs) cho mỗi topic
+    const enrichedTopics = await Promise.all(
+      topics.map(async (topic: any) => {
+        const songsCount = await this.songService.findOfTopic(topic._id);
+        const count = songsCount.length || 0;
+        return {
+          ...topic.toObject(), // Chuyển từ mongoose object sang plain object
+          songsCount: count, // Thêm trường số lượng bài hát
+        };
+      }),
+    );
+
+    return enrichedTopics;
   }
   async findOne(id: string): Promise<Topic> {
     if (!isValidObjectId(id)) {
