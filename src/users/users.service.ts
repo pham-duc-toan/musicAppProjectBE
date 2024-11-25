@@ -27,13 +27,7 @@ export class UserService {
     @Inject(forwardRef(() => PlaylistService))
     private readonly playlistService: PlaylistService,
   ) {}
-  checkRoleExist = async (id: string) => {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException('Sai định dạng id');
-    }
-    const result = await this.roleService.checkRoleExist(id);
-    return result;
-  };
+
   getHashPassWord = (password: string) => {
     const salt = genSaltSync(10);
     const hash = hashSync(password, salt);
@@ -48,13 +42,14 @@ export class UserService {
       username: createUserDto.username,
       type: createUserDto.type,
     });
-    const result = await this.checkRoleExist(createUserDto.role);
-    if (!result) {
-      throw new BadRequestException(`Role ${createUserDto.role} is not valid`);
-    }
+    const roleClient: any = await this.roleService.findRoleClient();
 
+    const fullCreateUserDto = {
+      ...createUserDto,
+      role: roleClient._id, // Thêm trường role mà không sửa DTO
+    };
     if (!existUser && !existUserId) {
-      const createdUser = new this.userModel(createUserDto);
+      const createdUser = new this.userModel(fullCreateUserDto);
       return createdUser.save();
     }
     throw new BadRequestException(`Đã tồn tại tài khoản!`);
@@ -179,8 +174,10 @@ export class UserService {
   }
   async deleteOne(id: string) {
     const user = await this.userModel.findById(id);
-    const singerId = user.singerId.toString();
-    await this.singerService.deleteSinger(singerId);
+    if (user?.singerId) {
+      const singerId = user.singerId.toString();
+      await this.singerService.deleteSinger(singerId);
+    }
     await this.playlistService.removeByDeleteUser(id);
     return await this.userModel.findByIdAndDelete(id).exec();
   }

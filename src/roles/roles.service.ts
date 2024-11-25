@@ -84,15 +84,8 @@ export class RolesService {
     }
     return role;
   }
-  async checkRoleExist(id: string): Promise<Boolean> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('Không đúng định dạng role');
-    }
-    const role = await this.roleModel.findOne({ _id: id }).exec();
-    if (!role) {
-      return false;
-    }
-    return true;
+  async findRoleClient() {
+    return this.roleModel.findOne({ roleName: 'User' });
   }
   async update(id: string, updateRoleDto: UpdateRoleDto): Promise<Role> {
     if (!isValidObjectId(id)) {

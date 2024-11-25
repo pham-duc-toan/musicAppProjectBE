@@ -19,8 +19,6 @@ export class CreateUserDto {
   userId: string;
   @IsNotEmpty({ message: 'Ten khong duoc de trong' })
   fullName: string;
-  @IsNotEmpty({ message: 'Role không được để trống' })
-  role: string;
   @IsNotEmpty({ message: 'Type không được để trống' })
   @IsIn(['SYSTEM'], {
     message: 'Không đúng định dạng type',
