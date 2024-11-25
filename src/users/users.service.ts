@@ -14,6 +14,7 @@ import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { RolesService } from 'src/roles/roles.service';
 import { SingersService } from 'src/singers/singers.service';
 import { PlaylistService } from 'src/playlist/playlist.service';
+import { changePassword } from './dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -73,7 +74,7 @@ export class UserService {
   }
   async addPlaylistToUser(userId: string, playlistId: string): Promise<User> {
     // Tìm user theo userId
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).select('-password');
 
     if (!user) {
       throw new NotFoundException('User không tồn tại');
@@ -88,6 +89,7 @@ export class UserService {
   async findUserId(userId: string) {
     const user = await this.userModel
       .findOne({ _id: userId })
+      .select('-password')
       .populate({
         path: 'listPlaylist',
         model: 'PlayList',
@@ -206,11 +208,13 @@ export class UserService {
     const playlistObjectId = new Types.ObjectId(playlistId);
 
     // Tìm user và cập nhật bằng cách xóa playlistId khỏi listPlaylist
-    const updatedUser = await this.userModel.findByIdAndUpdate(
-      userId,
-      { $pull: { listPlaylist: playlistObjectId } },
-      { new: true },
-    );
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(
+        userId,
+        { $pull: { listPlaylist: playlistObjectId } },
+        { new: true },
+      )
+      .select('-password');
 
     // Nếu user không tồn tại, ném lỗi
     if (!updatedUser) {
@@ -224,7 +228,7 @@ export class UserService {
     const singerObjectId = new Types.ObjectId(singerId);
 
     // Kiểm tra người dùng có tồn tại không
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).select('-password');
     if (!user) {
       throw new NotFoundException('User không tồn tại');
     }
@@ -235,9 +239,11 @@ export class UserService {
     }
 
     // Kiểm tra xem singerId đã được quản lý bởi user khác chưa
-    const singerManaged = await this.userModel.findOne({
-      singerId: singerObjectId,
-    });
+    const singerManaged = await this.userModel
+      .findOne({
+        singerId: singerObjectId,
+      })
+      .select('-password');
     if (singerManaged) {
       throw new BadRequestException('Singer đã được quản lý');
     }
@@ -251,11 +257,13 @@ export class UserService {
   async updateProfile(userId: Types.ObjectId, updateUser: UpdateUserDto) {
     try {
       // Kiểm tra và cập nhật người dùng
-      const user = await this.userModel.findOneAndUpdate(
-        { _id: userId }, // Điều kiện tìm kiếm
-        updateUser, // Dữ liệu cần cập nhật
-        { new: true }, // Trả về bản ghi sau khi cập nhật
-      );
+      const user = await this.userModel
+        .findOneAndUpdate(
+          { _id: userId }, // Điều kiện tìm kiếm
+          updateUser, // Dữ liệu cần cập nhật
+          { new: true }, // Trả về bản ghi sau khi cập nhật
+        )
+        .select('-password');
 
       if (!user) {
         throw new Error('Người dùng không tồn tại.');
@@ -278,6 +286,7 @@ export class UserService {
     // Tìm user theo userId và populate listFavoriteSong để lấy chi tiết các bài hát
     const user = await this.userModel
       .findById(userId)
+      .select('-password')
       .populate({
         path: 'listFavoriteSong',
         model: 'Song', // Model 'Song' cần khớp với tên model của bài hát
@@ -293,7 +302,7 @@ export class UserService {
 
   async addSongFavorite(userId: Types.ObjectId, songId: string): Promise<User> {
     // Tìm user theo userId
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).select('-password');
 
     if (!user) {
       throw new NotFoundException('User không tồn tại');
@@ -316,7 +325,7 @@ export class UserService {
     songId: string,
   ): Promise<User> {
     // Tìm user theo userId
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).select('-password');
 
     if (!user) {
       throw new NotFoundException('User không tồn tại');
@@ -340,7 +349,7 @@ export class UserService {
     return user;
   }
   async updateStatus(userId: string): Promise<User> {
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).select('-password');
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -355,16 +364,20 @@ export class UserService {
     return user;
   }
   async updateRole(userId: string, roleId: string): Promise<User> {
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).select('-password');
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return await this.userModel.findByIdAndUpdate(userId, { role: roleId });
+    return await this.userModel
+      .findByIdAndUpdate(userId, { role: roleId })
+      .select('-password');
   }
   //user thay doi khi xoa role
   async removeRole(roleId: string, roleNew: string) {
-    return await this.userModel.updateMany({ role: roleId }, { role: roleNew });
+    return await this.userModel
+      .updateMany({ role: roleId }, { role: roleNew })
+      .select('-password');
   }
   async test(): Promise<void> {
     try {
@@ -376,5 +389,31 @@ export class UserService {
     } catch (error) {
       console.error('Error updating users:', error);
     }
+  }
+  //user đổi mật khẩu
+  async changePassword(username: string, dataPass: changePassword) {
+    const { passOld, passNew } = dataPass;
+
+    // Tìm user dựa trên username
+    const user = await this.userModel.findOne({ username });
+
+    if (!user) {
+      throw new BadRequestException('Người dùng không tồn tại!');
+    }
+
+    // Kiểm tra mật khẩu cũ có khớp không
+    const isMatch = compareSync(passOld, user.password); // So sánh mật khẩu cũ
+    if (!isMatch) {
+      throw new BadRequestException('Sai mật khẩu cũ!');
+    }
+
+    // Mã hóa mật khẩu mới
+    const hashedPassword = this.getHashPassWord(passNew);
+
+    // Cập nhật mật khẩu mới cho user
+    user.password = hashedPassword;
+    await user.save(); // Lưu thay đổi vào cơ sở dữ liệu
+
+    return { message: 'Đổi mật khẩu thành công!' };
   }
 }

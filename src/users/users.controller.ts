@@ -21,6 +21,7 @@ import { UpdateSinger } from './dto/update-singer.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ValidatorFileTypeImage } from 'src/interceptors/ValidatorFileExist.interceptor';
 import { CloudinaryFileUploadInterceptor } from 'src/interceptors/FileToLinkOnlineCloudinary.interceptor';
+import { changePassword } from './dto/change-password.dto';
 
 @Controller('users')
 export class UserController {
@@ -81,7 +82,11 @@ export class UserController {
   ): Promise<User> {
     return this.userService.updateRole(idUser, idRole);
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  async changePassword(@Request() req, @Body() body: changePassword) {
+    return this.userService.changePassword(req.user.username, body);
+  }
   @Get('test')
   async test() {
     this.userService.test();
