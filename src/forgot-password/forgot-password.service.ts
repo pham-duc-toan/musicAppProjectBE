@@ -1,3 +1,4 @@
+import * as nodemailer from 'nodemailer';
 import {
   Injectable,
   NotFoundException,
@@ -18,6 +19,25 @@ export class ForgotPasswordService {
     private forgotPasswordModel: Model<ForgotPassword>,
     private readonly userService: UserService, // Inject UserService để xử lý người dùng
   ) {}
+  private async sendOtpEmail(email: string, otp: string) {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER, // Lấy từ biến môi trường
+        pass: process.env.EMAIL_PASS, // Lấy từ biến môi trường
+      },
+    });
+
+    const mailOptions = {
+      from: `"AppMusicToandeptrai" <${process.env.EMAIL_USER}>`, // Địa chỉ email gửi
+      to: email,
+      subject: 'Mã OTP của bạn',
+      text: `Mã OTP của bạn là: ${otp}. Mã này sẽ hết hạn sau 3 phút.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`OTP ${otp} đã được gửi tới email ${email}`);
+  }
 
   async create(
     createForgotPasswordDto: CreateForgotPasswordDto,
@@ -44,8 +64,8 @@ export class ForgotPasswordService {
       await this.forgotPasswordModel.create({ email, otp, expiredAt });
     }
 
-    // Gửi OTP qua email (ví dụ, dùng service email giả)
-    console.log(`Gửi OTP ${otp} đến email ${email}`);
+    // Gửi OTP qua email
+    await this.sendOtpEmail(email, otp);
 
     return 'OTP đã được gửi đến email của bạn';
   }
