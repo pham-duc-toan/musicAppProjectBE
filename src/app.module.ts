@@ -14,6 +14,7 @@ import { SongsModule } from './songs/songs.module';
 import { TopicsModule } from './topics/topics.module';
 import { PlaylistModule } from './playlist/playlist.module';
 import { SongForYouModule } from './song-for-you/song-for-you.module';
+import { ForgotPasswordModule } from './forgot-password/forgot-password.module';
 @Module({
   imports: [
     MongooseModule.forRootAsync({
@@ -38,6 +39,7 @@ import { SongForYouModule } from './song-for-you/song-for-you.module';
     TopicsModule,
     PlaylistModule,
     SongForYouModule,
+    ForgotPasswordModule,
   ],
   controllers: [AppController],
   providers: [AppService],

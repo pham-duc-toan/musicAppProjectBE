@@ -413,4 +413,22 @@ export class UserService {
 
     return { message: 'Đổi mật khẩu thành công!' };
   }
+  //user cap nhat mat khau moi
+  async changePasswordByOTP(username: string, passNew: string) {
+    // Tìm user dựa trên username
+    const user = await this.userModel.findOne({ username });
+
+    if (!user) {
+      throw new BadRequestException('Người dùng không tồn tại!');
+    }
+
+    // Mã hóa mật khẩu mới
+    const hashedPassword = this.getHashPassWord(passNew);
+
+    // Cập nhật mật khẩu mới cho user
+    user.password = hashedPassword;
+    await user.save(); // Lưu thay đổi vào cơ sở dữ liệu
+
+    return { message: 'Đổi mật khẩu thành công!' };
+  }
 }
