@@ -17,14 +17,14 @@ export class ForgotPasswordService {
   constructor(
     @InjectModel(ForgotPassword.name)
     private forgotPasswordModel: Model<ForgotPassword>,
-    private readonly userService: UserService, // Inject UserService để xử lý người dùng
+    private readonly userService: UserService,
   ) {}
   private async sendOtpEmail(email: string, otp: string) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER, // Lấy từ biến môi trường
-        pass: process.env.EMAIL_PASS, // Lấy từ biến môi trường
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
@@ -36,7 +36,6 @@ export class ForgotPasswordService {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`OTP ${otp} đã được gửi tới email ${email}`);
   }
 
   async create(

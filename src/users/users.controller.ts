@@ -33,7 +33,7 @@ export class UserController {
   }
 
   @Get()
-  async findAll(@Query() query: any): Promise<User[]> {
+  async findAll(@Query() query: any) {
     const { sort, skip, limit, projection, population, ...e } = aqp(query);
     const filter = e.filter;
     return this.userService.findAll({

@@ -55,10 +55,10 @@ export class UserService {
     throw new BadRequestException(`Đã tồn tại tài khoản!`);
   }
 
-  async findAll(options: any): Promise<User[]> {
+  async findAll(options: any) {
     const { filter, sort, skip, limit, projection, population } = options;
-
-    return this.userModel
+    const total = await this.userModel.countDocuments(filter);
+    const data = await this.userModel
       .find(filter)
       .sort(sort)
       .select('-password')
@@ -66,6 +66,7 @@ export class UserService {
       .limit(limit)
       .populate(population)
       .exec();
+    return { data, total };
   }
   async addPlaylistToUser(userId: string, playlistId: string): Promise<User> {
     // Tìm user theo userId

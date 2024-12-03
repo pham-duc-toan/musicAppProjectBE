@@ -52,6 +52,10 @@ export class SongsService {
     const { filter, sort, skip, limit, projection, population } = options;
     const sortOption = sort || { createdAt: -1 };
     const populateOption = population || ['singerId', 'topicId'];
+    const total = await this.songModel.countDocuments({
+      status: 'active',
+      deleted: 'false',
+    });
     const data = await this.songModel
       .find({ status: 'active', deleted: 'false' })
       .find({
@@ -72,7 +76,7 @@ export class SongsService {
       throw new BadRequestException('Lỗi tìm kiếm song service');
     }
 
-    return { data, total: data.length };
+    return { data, total };
   }
 
   async findOfSinger(singerId: string) {
@@ -93,13 +97,32 @@ export class SongsService {
       .sort({ createdAt: -1 })
       .exec();
   }
-  async findFull(): Promise<Song[]> {
-    return this.songModel
-      .find({ deleted: false })
-      .populate('singerId')
-      .populate('topicId')
-      .sort({ createdAt: -1 })
+  async findFull(options: any) {
+    const { filter, sort, skip, limit, projection, population } = options;
+    const sortOption = sort || { createdAt: -1 };
+    const populateOption = population || ['singerId', 'topicId'];
+    const total = await this.songModel.countDocuments();
+    const data = await this.songModel
+
+      .find({
+        $or: [
+          { title: new RegExp(filter.query, 'i') },
+          { lyrics: new RegExp(filter.query, 'i') },
+          { slug: new RegExp(convertToSlug(filter.query), 'i') },
+          { filter },
+        ],
+      })
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .populate(populateOption)
       .exec();
+
+    if (!data) {
+      throw new BadRequestException('Lỗi tìm kiếm song service');
+    }
+
+    return { data, total };
   }
   async findOne(id: string): Promise<Song> {
     if (!isValidObjectId(id)) {

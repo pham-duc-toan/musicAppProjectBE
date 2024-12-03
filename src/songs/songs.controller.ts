@@ -104,8 +104,18 @@ export class SongsController {
   }
   @UseGuards(JwtAuthGuard)
   @Get('full')
-  findFull() {
-    return this.songsService.findFull();
+  findFull(@Query() query: any) {
+    const { sort, skip, limit, projection, population, ...e } = aqp(query);
+
+    const filter = e.filter;
+    return this.songsService.findFull({
+      filter,
+      sort,
+      skip,
+      limit,
+      projection,
+      population,
+    });
   }
   @Get()
   findAll(@Query() query: any) {
