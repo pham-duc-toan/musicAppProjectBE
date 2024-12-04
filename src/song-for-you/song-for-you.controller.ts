@@ -7,11 +7,13 @@ import {
   Body,
   Patch,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 import { Types } from 'mongoose';
 import { SongForYouService } from './song-for-you.service';
 import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
+import aqp from 'api-query-params';
 
 @Controller('song-for-you')
 export class SongForYouController {
@@ -23,8 +25,18 @@ export class SongForYouController {
     return this.songForYouService.getRecommendedSongs();
   }
   @Get('client')
-  async getClientRecommendedSongs() {
-    return this.songForYouService.getClientRecommendSong();
+  async getClientRecommendedSongs(@Query() query: any) {
+    const { sort, skip, limit, projection, population, ...e } = aqp(query);
+
+    const filter = e.filter;
+    return this.songForYouService.getClientRecommendSong({
+      filter,
+      sort,
+      skip,
+      limit,
+      projection,
+      population,
+    });
   }
   // lay ra danh sach bai hat de xuat nhung o dang id
   @Get('songId')

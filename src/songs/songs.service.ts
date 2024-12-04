@@ -51,6 +51,7 @@ export class SongsService {
   async findAll(options: any): Promise<{ data: Song[]; total: number }> {
     const { filter, sort, skip, limit, projection, population } = options;
     const sortOption = sort || { createdAt: -1 };
+
     const populateOption = population || ['singerId', 'topicId'];
     const total = await this.songModel.countDocuments({
       status: 'active',

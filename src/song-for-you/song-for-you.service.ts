@@ -31,7 +31,9 @@ export class SongForYouService {
       })
       .exec();
   }
-  async getClientRecommendSong(): Promise<SongForYou> {
+  async getClientRecommendSong(options: any): Promise<SongForYou> {
+    const { filter, sort, skip, limit, projection, population } = options;
+
     const songForYou = await this.songForYouModel
       .findOne({})
       .populate({
@@ -52,9 +54,11 @@ export class SongForYouService {
 
     if (songForYou?.listSong) {
       // Lọc các bài hát có status là 'active'
-      songForYou.listSong = songForYou.listSong.filter(
-        (song: any) => song.status === 'active' && song.deleted === false,
-      );
+      songForYou.listSong = songForYou.listSong
+        .filter(
+          (song: any) => song.status === 'active' && song.deleted === false,
+        )
+        .slice(0, limit);
     }
 
     return songForYou;
