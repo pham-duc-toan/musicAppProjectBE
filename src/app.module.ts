@@ -15,6 +15,8 @@ import { TopicsModule } from './topics/topics.module';
 import { PlaylistModule } from './playlist/playlist.module';
 import { SongForYouModule } from './song-for-you/song-for-you.module';
 import { ForgotPasswordModule } from './forgot-password/forgot-password.module';
+import { PaymentModule } from './payment/payment.module';
+import { OrderModule } from './order/order.module';
 @Module({
   imports: [
     MongooseModule.forRootAsync({
@@ -40,6 +42,8 @@ import { ForgotPasswordModule } from './forgot-password/forgot-password.module';
     PlaylistModule,
     SongForYouModule,
     ForgotPasswordModule,
+    PaymentModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

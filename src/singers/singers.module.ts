@@ -8,11 +8,13 @@ import { SingersController } from './singers.controller';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { UserModule } from 'src/users/users.module';
 import { SongsModule } from 'src/songs/songs.module';
+import { OrderModule } from 'src/order/order.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Singer.name, schema: SingerSchema }]),
     CloudinaryModule,
+    OrderModule,
     forwardRef(() => UserModule),
     forwardRef(() => SongsModule),
   ],

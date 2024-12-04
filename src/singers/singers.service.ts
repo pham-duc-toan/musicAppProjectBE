@@ -9,6 +9,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
@@ -17,6 +18,8 @@ import { UpdateSingerDto } from './dto/update-singer.dto';
 import { convertToSlug } from 'src/helpers/convertToSlug';
 import { UserService } from 'src/users/users.service';
 import { SongsService } from 'src/songs/songs.service';
+import { CreateSingerDto } from './dto/create-singer.dto';
+import { OrderService } from 'src/order/order.service';
 
 @Injectable()
 export class SingersService {
@@ -26,6 +29,7 @@ export class SingersService {
     private readonly userService: UserService,
     @Inject(forwardRef(() => SongsService))
     private readonly songService: SongsService,
+    private readonly orderService: OrderService,
   ) {}
   async existId(id: string) {
     if (!isValidObjectId(id)) {
@@ -38,9 +42,17 @@ export class SingersService {
     return false;
   }
 
-  async createSinger(data: Partial<Singer>, userId: any) {
-    //kiem tra va xoa ma giao dich trong database, neu ko co thi throw luon
-    const newSinger = new this.singerModel(data);
+  async createSinger(data: CreateSingerDto, userId: any) {
+    const { orderId, ...dataNew } = data;
+    const order = await this.orderService.getOrderById(orderId);
+
+    if (!order || order?.status != 'init') {
+      throw new UnauthorizedException(
+        'Không thể tạo vì status order khác init hoặc không tồn tại order',
+      );
+    }
+    await this.orderService.updateStatus(orderId, 'done');
+    const newSinger = new this.singerModel(dataNew);
     await newSinger.save();
     return this.userService.updateSinger(userId, newSinger._id.toString());
   }
