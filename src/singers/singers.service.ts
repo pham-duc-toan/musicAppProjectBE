@@ -38,9 +38,11 @@ export class SingersService {
     return false;
   }
 
-  async createSinger(data: Partial<Singer>) {
+  async createSinger(data: Partial<Singer>, userId: any) {
+    //kiem tra va xoa ma giao dich trong database, neu ko co thi throw luon
     const newSinger = new this.singerModel(data);
-    return newSinger.save();
+    await newSinger.save();
+    return this.userService.updateSinger(userId, newSinger._id.toString());
   }
   async patchSinger(id: string, updateSingerDto: UpdateSingerDto) {
     if (!isValidObjectId(id)) {

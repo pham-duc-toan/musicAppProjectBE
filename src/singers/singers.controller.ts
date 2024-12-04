@@ -43,8 +43,11 @@ export class SingersController {
     ValidatorFileExistImage,
     CloudinaryFileUploadInterceptor,
   )
-  async createSinger(@Body() createSingerDto: CreateSingerDto) {
-    return this.singersService.createSinger(createSingerDto);
+  async createSinger(@Body() createSingerDto: CreateSingerDto, @Request() req) {
+    if (req.user.singerId) {
+      throw new UnauthorizedException('Bạn đã quản lý ca sĩ rồi!');
+    }
+    return this.singersService.createSinger(createSingerDto, req.user._id);
   }
   @Get()
   @ResponeMessage('Find all')

@@ -289,4 +289,10 @@ export class SongsService {
 
     return song;
   }
+  async test() {
+    return this.songModel.updateMany(
+      { topicId: '653b3f79884a78f7ecf902e1' },
+      { topicId: '67500b84409ba47eea8e2ba3' },
+    );
+  }
 }

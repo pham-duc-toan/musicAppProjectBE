@@ -194,6 +194,6 @@ export class SongsController {
   async test() {
     console.log('check');
 
-    // return await this.songsService.test();
+    return await this.songsService.test();
   }
 }
