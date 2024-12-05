@@ -164,6 +164,7 @@ export class SingersService {
 
     const singer = await this.singerModel.deleteOne({ _id: id });
     await this.userService.deleteSinger(id);
+
     return singer;
   }
 

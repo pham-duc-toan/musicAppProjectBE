@@ -19,14 +19,22 @@ export class PaymentController {
 
     // Kiểm tra nếu thanh toán thành công (resultCode = 0)
     if (resultCode == '0') {
-      await this.orderService.updateResultCode(orderId, resultCode.toString());
+      await this.orderService.updateResultCode(
+        orderId,
+        resultCode.toString(),
+        message,
+      );
       return {
         status: 'success',
         message: 'Thanh toán thành công',
         ipnData,
       };
     } else {
-      await this.orderService.updateResultCode(orderId, resultCode.toString());
+      await this.orderService.updateResultCode(
+        orderId,
+        resultCode.toString(),
+        message,
+      );
       return {
         status: 'failed',
         message: `Thanh toán thất bại: ${message}`,

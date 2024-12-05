@@ -27,11 +27,12 @@ export class OrderService {
   async updateResultCode(
     orderId: string,
     resultCode: string,
+    message: string,
   ): Promise<Order | null> {
     return this.orderModel
       .findOneAndUpdate(
         { orderId },
-        { resultCode: resultCode.toString() }, // Đảm bảo resultCode là chuỗi
+        { resultCode: resultCode.toString(), message }, // Đảm bảo resultCode là chuỗi
         { new: true }, // Trả về bản ghi đã cập nhật
       )
       .exec();

@@ -41,6 +41,8 @@ export class OrderController {
       userId: req.user._id,
       orderId,
       resultCode: '1000',
+      message:
+        'Giao dịch đã được khởi tạo, chờ người dùng xác nhận thanh toán.',
     };
     return this.orderService.createOrder(bodyNew);
   }
@@ -48,6 +50,7 @@ export class OrderController {
   async patchResultCode(
     @Param('orderId') orderId: string,
     @Body('resultCode') resultCode: string | number,
+    @Body('message') message: string,
   ): Promise<Order> {
     if (!resultCode) {
       throw new BadRequestException('Thiếu resultCode để cập nhật');
@@ -56,6 +59,7 @@ export class OrderController {
     const updatedOrder = await this.orderService.updateResultCode(
       orderId,
       resultCode.toString(),
+      message,
     );
     if (!updatedOrder) {
       throw new NotFoundException(

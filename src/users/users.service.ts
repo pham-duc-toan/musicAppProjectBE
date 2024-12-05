@@ -274,9 +274,10 @@ export class UserService {
   }
   // xoa singerId khi singerId xoa
   async deleteSinger(singerId: string) {
-    return await this.userModel.updateOne(
-      { singerId: singerId },
-      { singerId: undefined },
+    return await this.userModel.findOneAndUpdate(
+      { singerId: new Types.ObjectId(singerId) }, // Chuyển `singerId` thành ObjectId
+      { singerId: null }, // Đặt lại giá trị null (hoặc undefined nếu muốn)
+      { new: true }, // Trả về bản ghi đã cập nhật
     );
   }
   //----FAVORITE SONGS--------
@@ -368,13 +369,16 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     return await this.userModel
-      .findByIdAndUpdate(userId, { role: roleId })
+      .findByIdAndUpdate(userId, { role: new Types.ObjectId(roleId) })
       .select('-password');
   }
   //user thay doi khi xoa role
   async removeRole(roleId: string, roleNew: string) {
     return await this.userModel
-      .updateMany({ role: roleId }, { role: roleNew })
+      .updateMany(
+        { role: new Types.ObjectId(roleId) },
+        { role: new Types.ObjectId(roleNew) },
+      )
       .select('-password');
   }
   async test(): Promise<void> {

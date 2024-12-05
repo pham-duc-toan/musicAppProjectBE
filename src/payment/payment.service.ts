@@ -101,6 +101,7 @@ export class PaymentService {
     await this.orderService.updateResultCode(
       result.data.orderId,
       result.data.resultCode.toString(),
+      result.data.message,
     );
 
     return result.data;

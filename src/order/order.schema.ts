@@ -14,6 +14,9 @@ export class Order extends Document {
 
   @Prop({ type: String, enum: ['init', 'done'], default: 'init' })
   status: string;
+
+  @Prop({ required: true })
+  message: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
