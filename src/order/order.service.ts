@@ -62,6 +62,6 @@ export class OrderService {
 
   // Lấy thông tin đơn hàng theo userId
   async getOrderById(userId: string): Promise<Order[]> {
-    return this.orderModel.find({ userId }).exec();
+    return this.orderModel.find({ userId }).sort({ createdAt: -1 }).exec();
   }
 }
