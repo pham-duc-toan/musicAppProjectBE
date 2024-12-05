@@ -49,14 +49,19 @@ export class OrderService {
   }
 
   // Lấy đơn hàng theo tháng (dựa vào createdAt)
-  async getOrdersByMonth(year: number, month: number): Promise<Order[]> {
+  async getOrdersByMonth(
+    year: number,
+    month: number,
+    options: any,
+  ): Promise<Order[]> {
     const startDate = new Date(year, month - 1, 1); // Bắt đầu từ ngày 1 của tháng
     const endDate = new Date(year, month, 0); // Kết thúc vào cuối tháng
-
+    const { filter, sort, skip, limit, projection, population } = options;
     return this.orderModel
       .find({
         createdAt: { $gte: startDate, $lt: endDate },
       })
+      .find(filter)
       .exec();
   }
 

@@ -12,10 +12,12 @@ import {
   NotFoundException,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Order } from './order.schema';
 import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
+import aqp from 'api-query-params';
 
 @Controller('orders')
 export class OrderController {
@@ -87,8 +89,19 @@ export class OrderController {
   async getOrdersByMonth(
     @Param('year') year: number,
     @Param('month') month: number,
+    @Query() query: any,
   ): Promise<Order[]> {
-    return this.orderService.getOrdersByMonth(year, month);
+    const { sort, skip, limit, projection, population, ...e } = aqp(query);
+
+    const filter = e.filter;
+    return this.orderService.getOrdersByMonth(year, month, {
+      filter,
+      sort,
+      skip,
+      limit,
+      projection,
+      population,
+    });
   }
 
   // API lấy thông tin đơn hàng theo orderId
