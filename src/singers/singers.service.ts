@@ -43,16 +43,20 @@ export class SingersService {
   }
 
   async createSinger(data: CreateSingerDto, userId: any) {
-    const { orderId, ...dataNew } = data;
-    const order = await this.orderService.getOrderById(orderId);
+    const order = await this.orderService.findOrder({
+      userId,
+      status: 'init',
+      resultCode: '0',
+    });
 
-    if (!order || order?.status != 'init') {
+    if (!order) {
       throw new UnauthorizedException(
-        'Không thể tạo vì status order khác init hoặc không tồn tại order',
+        'Không thể tạo vì chuyển khoản không hợp lệ!',
       );
     }
-    await this.orderService.updateStatus(orderId, 'done');
-    const newSinger = new this.singerModel(dataNew);
+
+    await this.orderService.updateStatus(order.orderId, 'done');
+    const newSinger = new this.singerModel(data);
     await newSinger.save();
     return this.userService.updateSinger(userId, newSinger._id.toString());
   }

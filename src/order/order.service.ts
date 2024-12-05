@@ -9,10 +9,32 @@ import { Order } from './order.schema';
 export class OrderService {
   constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
 
-  // Tạo đơn hàng mới
-  async createOrder(orderId: string): Promise<Order> {
-    const order = new this.orderModel({ orderId, status: 'init' });
-    return order.save();
+  // Tạo đơn hàng
+  async createOrder(body: any): Promise<Order> {
+    const newOrder = new this.orderModel(body);
+    return newOrder.save();
+  }
+
+  // Tìm đơn hàng theo orderId
+  async findOrderByOrderId(orderId: string): Promise<Order | null> {
+    return this.orderModel.findOne({ orderId }).exec();
+  }
+  // Tìm đơn hàng theo orderId
+  async findOrder(filter: any): Promise<Order | null> {
+    return this.orderModel.findOne(filter).exec();
+  }
+  // Cập nhật resultCode
+  async updateResultCode(
+    orderId: string,
+    resultCode: string,
+  ): Promise<Order | null> {
+    return this.orderModel
+      .findOneAndUpdate(
+        { orderId },
+        { resultCode: resultCode.toString() }, // Đảm bảo resultCode là chuỗi
+        { new: true }, // Trả về bản ghi đã cập nhật
+      )
+      .exec();
   }
 
   // Cập nhật trạng thái đơn hàng
@@ -30,13 +52,15 @@ export class OrderService {
     const startDate = new Date(year, month - 1, 1); // Bắt đầu từ ngày 1 của tháng
     const endDate = new Date(year, month, 0); // Kết thúc vào cuối tháng
 
-    return this.orderModel.find({
-      createdAt: { $gte: startDate, $lt: endDate },
-    });
+    return this.orderModel
+      .find({
+        createdAt: { $gte: startDate, $lt: endDate },
+      })
+      .exec();
   }
 
-  // Lấy thông tin đơn hàng theo orderId
-  async getOrderById(orderId: string): Promise<Order> {
-    return this.orderModel.findOne({ orderId });
+  // Lấy thông tin đơn hàng theo userId
+  async getOrderById(userId: string): Promise<Order[]> {
+    return this.orderModel.find({ userId }).exec();
   }
 }

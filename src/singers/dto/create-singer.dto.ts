@@ -16,9 +16,6 @@ export class CreateSingerDto {
 
   @IsString()
   status: string;
-
-  @IsString()
-  orderId: string;
 }
 
 // src/singers/dto/update-singer.dto.ts

@@ -1,30 +1,82 @@
 // src/order/order.controller.ts
 
-import { Controller, Post, Body, Param, Patch, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Get,
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Order } from './order.schema';
+import { JwtAuthGuard } from 'src/auth/passport/jwt-auth.guard';
 
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  // // API tạo đơn hàng
-  // @Post('create')
-  // async createOrder(@Body('orderId') orderId: string): Promise<Order> {
-  //   return this.orderService.createOrder(orderId);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('create')
+  async createOrder(@Body() body: any, @Request() req): Promise<Order> {
+    const { orderId } = body;
 
-  // @Patch(':orderId/status')
-  // async updateStatus(
-  //   @Param('orderId') orderId: string,
-  //   @Body('status') status: string,
-  // ): Promise<Order> {
-  //   if (status !== 'done') {
-  //     throw new Error('Status can only be updated to "done"');
-  //   }
+    if (!orderId) {
+      throw new BadRequestException('Thiếu thông tin bắt buộc: orderId');
+    }
 
-  //   return this.orderService.updateStatus(orderId, status);
-  // }
+    // Kiểm tra trùng lặp orderId
+    const existingOrder = await this.orderService.findOrderByOrderId(orderId);
+    if (existingOrder) {
+      throw new ConflictException(
+        `Đơn hàng với orderId "${orderId}" đã tồn tại`,
+      );
+    }
+    const bodyNew = {
+      userId: req.user._id,
+      orderId,
+      resultCode: '1000',
+    };
+    return this.orderService.createOrder(bodyNew);
+  }
+  @Patch('update-result-code/:orderId')
+  async patchResultCode(
+    @Param('orderId') orderId: string,
+    @Body('resultCode') resultCode: string | number,
+  ): Promise<Order> {
+    if (!resultCode) {
+      throw new BadRequestException('Thiếu resultCode để cập nhật');
+    }
+
+    const updatedOrder = await this.orderService.updateResultCode(
+      orderId,
+      resultCode.toString(),
+    );
+    if (!updatedOrder) {
+      throw new NotFoundException(
+        `Không tìm thấy đơn hàng với orderId "${orderId}"`,
+      );
+    }
+
+    return updatedOrder;
+  }
+
+  @Patch(':orderId/status')
+  async updateStatus(
+    @Param('orderId') orderId: string,
+    @Body('status') status: string,
+  ): Promise<Order> {
+    if (status !== 'done') {
+      throw new Error('Status can only be updated to "done"');
+    }
+
+    return this.orderService.updateStatus(orderId, status);
+  }
 
   // API lấy tất cả đơn hàng trong một tháng cụ thể (dựa vào createdAt)
   @Get('month/:year/:month')
@@ -36,8 +88,17 @@ export class OrderController {
   }
 
   // API lấy thông tin đơn hàng theo orderId
-  @Get(':orderId')
-  async getOrderById(@Param('orderId') orderId: string): Promise<Order> {
-    return this.orderService.getOrderById(orderId);
+  @Get(':userId')
+  async getOrderById(@Param('userId') userId: string): Promise<Order[]> {
+    return this.orderService.getOrderById(userId);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('checkUser/payment')
+  async checkHopLeUser(@Request() req): Promise<Order> {
+    return this.orderService.findOrder({
+      userId: req.user._id,
+      status: 'init',
+      resultCode: '0',
+    });
   }
 }
