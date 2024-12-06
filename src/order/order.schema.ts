@@ -17,6 +17,9 @@ export class Order extends Document {
 
   @Prop({ required: true })
   message: string;
+
+  @Prop({ required: true })
+  shortLink: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

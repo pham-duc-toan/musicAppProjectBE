@@ -26,10 +26,10 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async createOrder(@Body() body: any, @Request() req): Promise<Order> {
-    const { orderId } = body;
+    const { orderId, shortLink } = body;
 
-    if (!orderId) {
-      throw new BadRequestException('Thiếu thông tin bắt buộc: orderId');
+    if (!orderId || !shortLink) {
+      throw new BadRequestException('Thiếu thông tin bắt buộc');
     }
 
     // Kiểm tra trùng lặp orderId
@@ -42,6 +42,7 @@ export class OrderController {
     const bodyNew = {
       userId: req.user._id,
       orderId,
+      shortLink,
       resultCode: '1000',
       message:
         'Giao dịch đã được khởi tạo, chờ người dùng xác nhận thanh toán.',

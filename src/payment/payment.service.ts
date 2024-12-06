@@ -13,7 +13,7 @@ export class PaymentService {
     const redirectUrl = 'http://localhost:3000/singers/createSinger';
     //link api moi
     const linkNgrok =
-      'https://27b2-2405-4802-500d-9760-4592-51e6-d777-301c.ngrok-free.app';
+      'https://2878-2405-4802-500d-9760-850e-9819-32ab-a396.ngrok-free.app';
     const ipnUrl = linkNgrok + '/api/v1/payment/ipn';
     const requestType = 'payWithMethod';
     const amount = '289000';
