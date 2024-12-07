@@ -139,12 +139,9 @@ export class SongsController {
   findSongOfTopic(@Param('topicId') topicId: string) {
     return this.songsService.findOfTopic(topicId);
   }
-  @Get('detail/:id')
-  findOne(@Param('id') id: string) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException('Sai định dạng id');
-    }
-    return this.songsService.findOne(id);
+  @Get('detail/:slug')
+  findOne(@Param('slug') slug: string) {
+    return this.songsService.findOne(slug);
   }
   @UseGuards(JwtAuthGuard)
   @Get('managerSong')

@@ -71,12 +71,9 @@ export class TopicsController {
       population,
     });
   }
-  @Get('detail/:id')
-  async findOne(@Param('id') id: string): Promise<Topic> {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException('Sai định dạng id');
-    }
-    return this.topicsService.findOne(id);
+  @Get('detail/:slug')
+  async findOne(@Param('slug') slug: string): Promise<Topic> {
+    return this.topicsService.findOne(slug);
   }
   @UseGuards(JwtAuthGuard)
   @Patch('editTopic/:id')

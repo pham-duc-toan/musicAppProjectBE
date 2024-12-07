@@ -142,12 +142,9 @@ export class SingersService {
     const singer = await this.singerModel.findById(id).exec();
     return singer;
   }
-  async findOneClient(id: string) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException('Sai định dạng id');
-    }
+  async findOneClient(slug: string) {
     const singer = await this.singerModel
-      .findOne({ _id: id, status: 'active', deleted: false })
+      .findOne({ slug, status: 'active', deleted: false })
       .exec();
     if (!singer) {
       throw new BadRequestException('Không tồn tại singer này!');

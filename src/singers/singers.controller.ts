@@ -103,12 +103,9 @@ export class SingersController {
     }
     return this.singersService.findOne(id);
   }
-  @Get('detailClient/:id')
-  async findOneClient(@Param('id') id: string) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException('Sai định dạng id');
-    }
-    return this.singersService.findOneClient(id);
+  @Get('detailClient/:slug')
+  async findOneClient(@Param('slug') slug: string) {
+    return this.singersService.findOneClient(slug);
   }
   //--------ADMIN QUAN LY-----
   @UseGuards(JwtAuthGuard)

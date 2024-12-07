@@ -125,12 +125,9 @@ export class SongsService {
 
     return { data, total };
   }
-  async findOne(id: string): Promise<Song> {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException('Sai định dạng id');
-    }
+  async findOne(slug: string): Promise<Song> {
     const song = await this.songModel
-      .findById(id)
+      .findOne({ slug })
       .populate('singerId')
       .populate('topicId')
       .exec();

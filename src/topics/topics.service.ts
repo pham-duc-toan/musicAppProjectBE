@@ -98,13 +98,10 @@ export class TopicsService {
 
     return enrichedTopics;
   }
-  async findOne(id: string): Promise<Topic> {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException('Sai định dạng id');
-    }
-    const topic = await this.topicModel.findById(id).exec();
+  async findOne(slug: string): Promise<Topic> {
+    const topic = await this.topicModel.findOne({ slug }).exec();
     if (!topic) {
-      throw new NotFoundException(`Topic with ID ${id} not found`);
+      throw new NotFoundException(`Topic with slug ${slug} not found`);
     }
     return topic;
   }
