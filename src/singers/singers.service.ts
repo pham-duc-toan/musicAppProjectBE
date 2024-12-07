@@ -77,7 +77,6 @@ export class SingersService {
 
   async findAll(options: any) {
     const { filter, sort, skip, limit, projection, population } = options;
-    console.log(filter);
 
     if (filter.fullName && typeof filter.fullName !== 'string') {
       filter.fullName = '';
@@ -101,7 +100,6 @@ export class SingersService {
   }
   async findClient(options: any) {
     const { filter, sort, skip, limit, projection, population } = options;
-    console.log(filter);
 
     if (filter.fullName && typeof filter.fullName !== 'string') {
       filter.fullName = '';
