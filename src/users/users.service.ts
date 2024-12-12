@@ -161,6 +161,9 @@ export class UserService {
       .populate('role')
       .lean()
       .exec();
+    if (!user) {
+      throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
+    }
     if (user.status == 'inactive') {
       throw new BadRequestException('Tài khoản của bạn đã bị khóa');
     }
