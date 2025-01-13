@@ -98,7 +98,7 @@ export class PlaylistService {
       _id: playlistId,
     });
 
-    const existSong = await this.songService.findOne(idSong);
+    const existSong = await this.songService.findOneById(idSong);
     if (!existSong) {
       throw new BadRequestException('Song id khong hop le');
     }
@@ -145,7 +145,7 @@ export class PlaylistService {
       _id: playlistId,
     });
 
-    const existSong = await this.songService.findOne(idSong);
+    const existSong = await this.songService.findOneById(idSong);
 
     if (!existSong) {
       throw new BadRequestException('Song id khong hop le');

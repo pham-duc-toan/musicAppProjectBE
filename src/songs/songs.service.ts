@@ -134,7 +134,15 @@ export class SongsService {
 
     return song;
   }
+  async findOneById(id: string): Promise<Song> {
+    const song = await this.songModel
+      .findOne({ _id: id })
+      .populate('singerId')
+      .populate('topicId')
+      .exec();
 
+    return song;
+  }
   async update(id: string, updateSongDto: UpdateSongDto, singerId: string) {
     if (!singerId) {
       throw new UnauthorizedException(
