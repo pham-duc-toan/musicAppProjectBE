@@ -9,6 +9,8 @@ import { JwtStrategy } from './passport/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RolesModule } from 'src/roles/roles.module';
 import { PermissionsModule } from 'src/permissions/permissions.module';
+import googleOauthConfig from './config/google-oauth-config';
+import { GoogleStrategy } from './passport/google.strategy';
 
 @Module({
   imports: [
@@ -26,8 +28,9 @@ import { PermissionsModule } from 'src/permissions/permissions.module';
         },
       }),
     }),
+    ConfigModule.forFeature(googleOauthConfig),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}

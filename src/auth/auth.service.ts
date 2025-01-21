@@ -136,4 +136,9 @@ export class AuthService {
       status: 'Logout success',
     };
   };
+  async validateGoogleUser(googleUser: any) {
+    const user = await this.usersService.findOneByEmailGoogle(googleUser.email);
+    if (user) return user;
+    return await this.usersService.createOAuthGoogle(googleUser);
+  }
 }

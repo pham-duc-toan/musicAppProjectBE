@@ -157,7 +157,7 @@ export class UserService {
   }
   async checkUserLogin(username: string, pass: string) {
     const user = await this.userModel
-      .findOne({ username: username })
+      .findOne({ username: username, type: 'SYSTEM' })
       .populate('role')
       .lean()
       .exec();
@@ -438,5 +438,30 @@ export class UserService {
     await user.save(); // Lưu thay đổi vào cơ sở dữ liệu
 
     return { message: 'Đổi mật khẩu thành công!' };
+  }
+  //GOOGLE OAUTH
+  //tim user bang email type google
+  async findOneByEmailGoogle(email: string) {
+    const user = await this.userModel
+      .findOne({
+        username: email,
+        type: 'GOOGLE',
+      })
+      .populate('role');
+    return user;
+  }
+  //tim user bang email type google
+  async createOAuthGoogle(googleUser) {
+    const roleClient: any = await this.roleService.findRoleClient();
+    const createdUser = new this.userModel({
+      username: googleUser.email,
+      fullName: googleUser.firstName + ' ' + googleUser.lastName,
+      avatar: googleUser.avatar,
+      userId: 'GG_' + googleUser.email,
+      type: 'GOOGLE',
+      role: roleClient._id,
+    });
+
+    return createdUser.save();
   }
 }
